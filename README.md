@@ -23,12 +23,19 @@ The script will default to using `checksums.md5` in the current working
 directory, but can also accept a custom checksum file path as an 
 optional argument.
 
-If the checksum file exists, it will check if any of the files 
-referenced within have a modification time newer than the checksum file
-and update the stored hashes for those files only.
+If the checksum file exists, it will use the file modification time as a 
+reference to add any new files and update the hashes for modified files.
+If **strict mode** is specified, *only* pre-existing hashes will be 
+updated (new files will not be added).
 
 If the file does not exist, it will create it and walk the directory 
 tree, starting from the path of the checksum file.
+
+| parameter | example | description |
+| --- | --- | --- |
+| -s | | Strict mode; only update existing checksums in file, don't add new files |
+| -v | | Boolean flag to enable verbose output |
+
 
 # Copyright and Licence
 
