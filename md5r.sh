@@ -99,14 +99,21 @@ function upd_chk_file() {
     ec=$?
 
     if [ $ec -ne 0 ]; then return $ec; fi
-
+    
     # Loop through the list of changed files
     if $strictmode; then
         echo "Strict mode selected; only updating existing hashes"
         cat "$changed_files" | while read filepath; do
+            # Remove the leading ./ from paths just in case the checksum
+            # file only contains files from the current directory
+            cleaned_path=`echo "$filepath" | sed "s|^\./||"`
+
             if grep -q -e "$filepath" "$chkfile"; then
                 # File exists in checksum file, so generate a new hash
                 md5sum -b "$filepath" >> "$temp_hashes"
+            elif grep -q -e "$cleaned_path" "$chkfile"; then
+                # File exists in checksum file, so generate a new hash
+                md5sum -b "$cleaned_path" >> "$temp_hashes"
             fi
         done
     else
@@ -115,7 +122,7 @@ function upd_chk_file() {
             md5sum -b "$filepath" >> "$temp_hashes"
         done
     fi
-
+    
     # Loop through original checksum file and delete rows
     # corresponding to removed or updated files
     cat "$chkfile" | while read hash filepath; do
